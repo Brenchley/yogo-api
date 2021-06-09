@@ -4,66 +4,48 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 )
 
-type Status string
-
-const (
-	StatusActive   Status = "active"
-	StatusInactive Status = "inactive"
-)
-
-func (e *Status) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Status(s)
-	case string:
-		*e = Status(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Status: %T", src)
-	}
-	return nil
-}
-
 type Interest struct {
-	ID           int32        `json:"id"`
-	InterestName string       `json:"interestName"`
-	InterestImg  string       `json:"interestImg"`
-	Updatedat    sql.NullTime `json:"updatedat"`
+	ID           int32
+	InterestName string
+	InterestImg  string
+	Updatedat    sql.NullTime
 }
 
 type Place struct {
-	ID           int32  `json:"id"`
-	PlaceName    string `json:"placeName"`
-	Location     string `json:"location"`
-	LocationName string `json:"locationName"`
-	PalceImg     string `json:"palceImg"`
-	InterestID   int32  `json:"interestID"`
+	ID           int32
+	PlaceName    string
+	Location     string
+	LocationName string
+	PalceImg     string
+	InterestID   int32
 }
 
 type Trip struct {
-	ID         int32     `json:"id"`
-	TripName   string    `json:"tripName"`
-	Cost       int32     `json:"cost"`
-	StartDate  time.Time `json:"startDate"`
-	Status     Status    `json:"status"`
-	Orgernizer int32     `json:"orgernizer"`
+	ID         int32
+	TripName   string
+	Cost       int32
+	Duration   int32
+	StartDate  time.Time
+	Status     int32
+	Orgernizer int32
 }
 
 type TripMember struct {
-	ID     int32 `json:"id"`
-	TripID int32 `json:"tripID"`
-	Member int32 `json:"member"`
+	ID     int32
+	TripID int32
+	Member int32
 }
 
 type User struct {
-	ID         int64          `json:"id"`
-	Email      string         `json:"email"`
-	Username   string         `json:"username"`
-	ProfilePic sql.NullString `json:"profilePic"`
-	Status     Status         `json:"status"`
-	Createdat  time.Time      `json:"createdat"`
-	Updatedat  sql.NullTime   `json:"updatedat"`
+	ID         int64
+	Email      string
+	Username   string
+	Status     int32
+	ProfilePic sql.NullString
+	IsActive   int32
+	Createdat  time.Time
+	Updatedat  sql.NullTime
 }
