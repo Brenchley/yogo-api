@@ -8,44 +8,44 @@ import (
 )
 
 type Interest struct {
-	ID           int32
-	InterestName string
-	InterestImg  string
-	Updatedat    sql.NullTime
+	ID           int32        `json:"id"`
+	InterestName string       `json:"interestName"`
+	InterestImg  string       `json:"interestImg"`
+	Updatedat    sql.NullTime `json:"updatedat"`
 }
 
 type Place struct {
-	ID           int32
-	PlaceName    string
-	Location     string
-	LocationName string
-	PalceImg     string
-	InterestID   int32
+	ID           int32  `json:"id"`
+	PlaceName    string `json:"placeName"`
+	Location     string `json:"location"`
+	LocationName string `json:"locationName"`
+	PalceImg     string `json:"palceImg"`
+	InterestID   int32  `json:"interestID"`
 }
 
 type Trip struct {
-	ID         int32
-	TripName   string
-	Cost       int32
-	Duration   int32
-	StartDate  time.Time
-	Status     int32
-	Orgernizer int32
+	ID         int32     `json:"id"`
+	TripName   string    `json:"tripName"`
+	Cost       int32     `json:"cost"`
+	Duration   int32     `json:"duration"`
+	StartDate  time.Time `json:"startDate"`
+	Status     int32     `json:"status"`
+	Orgernizer int32     `json:"orgernizer"`
 }
 
 type TripMember struct {
-	ID     int32
-	TripID int32
-	Member int32
+	ID     int32 `json:"id"`
+	TripID int32 `json:"tripID"`
+	Member int32 `json:"member"`
 }
 
 type User struct {
-	ID         int64
-	Email      string
-	Username   string
-	Status     int32
-	ProfilePic sql.NullString
-	IsActive   int32
-	Createdat  time.Time
-	Updatedat  sql.NullTime
+	ID         int64          `json:"id"`
+	Email      string         `json:"email"`
+	Username   string         `json:"username"`
+	Status     int32          `json:"status"`
+	ProfilePic sql.NullString `json:"profilePic"`
+	IsActive   int32          `json:"isActive"`
+	Createdat  time.Time      `json:"createdat"`
+	Updatedat  sql.NullTime   `json:"updatedat"`
 }

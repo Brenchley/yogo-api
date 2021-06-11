@@ -18,12 +18,12 @@ INSERT INTO interests (
 `
 
 type CreateInterestParams struct {
-	InterestName string
-	InterestImg  string
+	InterestName string `json:"interestName"`
+	InterestImg  string `json:"interestImg"`
 }
 
 func (q *Queries) CreateInterest(ctx context.Context, arg CreateInterestParams) (Interest, error) {
-	row := q.db.QueryRowContext(ctx, createInterest, arg.InterestName, arg.InterestImg)
+	row := q.queryRow(ctx, q.createInterestStmt, createInterest, arg.InterestName, arg.InterestImg)
 	var i Interest
 	err := row.Scan(
 		&i.ID,
@@ -43,15 +43,15 @@ INSERT INTO places (
 `
 
 type CreatePlaceParams struct {
-	PlaceName    string
-	Location     string
-	LocationName string
-	PalceImg     string
-	InterestID   int32
+	PlaceName    string `json:"placeName"`
+	Location     string `json:"location"`
+	LocationName string `json:"locationName"`
+	PalceImg     string `json:"palceImg"`
+	InterestID   int32  `json:"interestID"`
 }
 
 func (q *Queries) CreatePlace(ctx context.Context, arg CreatePlaceParams) (Place, error) {
-	row := q.db.QueryRowContext(ctx, createPlace,
+	row := q.queryRow(ctx, q.createPlaceStmt, createPlace,
 		arg.PlaceName,
 		arg.Location,
 		arg.LocationName,
@@ -79,16 +79,16 @@ INSERT INTO trips (
 `
 
 type CreateTripParams struct {
-	TripName   string
-	Duration   int32
-	Cost       int32
-	StartDate  time.Time
-	Status     int32
-	Orgernizer int32
+	TripName   string    `json:"tripName"`
+	Duration   int32     `json:"duration"`
+	Cost       int32     `json:"cost"`
+	StartDate  time.Time `json:"startDate"`
+	Status     int32     `json:"status"`
+	Orgernizer int32     `json:"orgernizer"`
 }
 
 func (q *Queries) CreateTrip(ctx context.Context, arg CreateTripParams) (Trip, error) {
-	row := q.db.QueryRowContext(ctx, createTrip,
+	row := q.queryRow(ctx, q.createTripStmt, createTrip,
 		arg.TripName,
 		arg.Duration,
 		arg.Cost,
@@ -118,12 +118,12 @@ INSERT INTO trip_members (
 `
 
 type CreateTripMemberParams struct {
-	TripID int32
-	Member int32
+	TripID int32 `json:"tripID"`
+	Member int32 `json:"member"`
 }
 
 func (q *Queries) CreateTripMember(ctx context.Context, arg CreateTripMemberParams) (TripMember, error) {
-	row := q.db.QueryRowContext(ctx, createTripMember, arg.TripID, arg.Member)
+	row := q.queryRow(ctx, q.createTripMemberStmt, createTripMember, arg.TripID, arg.Member)
 	var i TripMember
 	err := row.Scan(&i.ID, &i.TripID, &i.Member)
 	return i, err
@@ -139,14 +139,14 @@ RETURNING id, email, username, status, profile_pic, is_active, createdat, update
 `
 
 type CreateUserParams struct {
-	Email      string
-	Username   string
-	ProfilePic sql.NullString
-	Status     int32
+	Email      string         `json:"email"`
+	Username   string         `json:"username"`
+	ProfilePic sql.NullString `json:"profilePic"`
+	Status     int32          `json:"status"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
+	row := q.queryRow(ctx, q.createUserStmt, createUser,
 		arg.Email,
 		arg.Username,
 		arg.ProfilePic,
@@ -172,7 +172,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetInterest(ctx context.Context, id int32) (Interest, error) {
-	row := q.db.QueryRowContext(ctx, getInterest, id)
+	row := q.queryRow(ctx, q.getInterestStmt, getInterest, id)
 	var i Interest
 	err := row.Scan(
 		&i.ID,
@@ -189,7 +189,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetTrip(ctx context.Context, id int32) (Trip, error) {
-	row := q.db.QueryRowContext(ctx, getTrip, id)
+	row := q.queryRow(ctx, q.getTripStmt, getTrip, id)
 	var i Trip
 	err := row.Scan(
 		&i.ID,
@@ -209,7 +209,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
+	row := q.queryRow(ctx, q.getUserStmt, getUser, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -230,7 +230,7 @@ ORDER BY id
 `
 
 func (q *Queries) ListInterests(ctx context.Context) ([]Interest, error) {
-	rows, err := q.db.QueryContext(ctx, listInterests)
+	rows, err := q.query(ctx, q.listInterestsStmt, listInterests)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +263,7 @@ WHERE trip_id = $1
 `
 
 func (q *Queries) ListTripMembers(ctx context.Context, tripID int32) ([]TripMember, error) {
-	rows, err := q.db.QueryContext(ctx, listTripMembers, tripID)
+	rows, err := q.query(ctx, q.listTripMembersStmt, listTripMembers, tripID)
 	if err != nil {
 		return nil, err
 	}
@@ -291,7 +291,7 @@ ORDER BY id
 `
 
 func (q *Queries) ListTrips(ctx context.Context) ([]Trip, error) {
-	rows, err := q.db.QueryContext(ctx, listTrips)
+	rows, err := q.query(ctx, q.listTripsStmt, listTrips)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +327,7 @@ ORDER BY createdAt
 `
 
 func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers)
+	rows, err := q.query(ctx, q.listUsersStmt, listUsers)
 	if err != nil {
 		return nil, err
 	}

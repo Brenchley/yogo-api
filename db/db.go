@@ -5,6 +5,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 type DBTX interface {
@@ -18,12 +19,178 @@ func New(db DBTX) *Queries {
 	return &Queries{db: db}
 }
 
+func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
+	q := Queries{db: db}
+	var err error
+	if q.createInterestStmt, err = db.PrepareContext(ctx, createInterest); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateInterest: %w", err)
+	}
+	if q.createPlaceStmt, err = db.PrepareContext(ctx, createPlace); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePlace: %w", err)
+	}
+	if q.createTripStmt, err = db.PrepareContext(ctx, createTrip); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateTrip: %w", err)
+	}
+	if q.createTripMemberStmt, err = db.PrepareContext(ctx, createTripMember); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateTripMember: %w", err)
+	}
+	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
+	}
+	if q.getInterestStmt, err = db.PrepareContext(ctx, getInterest); err != nil {
+		return nil, fmt.Errorf("error preparing query GetInterest: %w", err)
+	}
+	if q.getTripStmt, err = db.PrepareContext(ctx, getTrip); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTrip: %w", err)
+	}
+	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
+	}
+	if q.listInterestsStmt, err = db.PrepareContext(ctx, listInterests); err != nil {
+		return nil, fmt.Errorf("error preparing query ListInterests: %w", err)
+	}
+	if q.listTripMembersStmt, err = db.PrepareContext(ctx, listTripMembers); err != nil {
+		return nil, fmt.Errorf("error preparing query ListTripMembers: %w", err)
+	}
+	if q.listTripsStmt, err = db.PrepareContext(ctx, listTrips); err != nil {
+		return nil, fmt.Errorf("error preparing query ListTrips: %w", err)
+	}
+	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
+	}
+	return &q, nil
+}
+
+func (q *Queries) Close() error {
+	var err error
+	if q.createInterestStmt != nil {
+		if cerr := q.createInterestStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createInterestStmt: %w", cerr)
+		}
+	}
+	if q.createPlaceStmt != nil {
+		if cerr := q.createPlaceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPlaceStmt: %w", cerr)
+		}
+	}
+	if q.createTripStmt != nil {
+		if cerr := q.createTripStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createTripStmt: %w", cerr)
+		}
+	}
+	if q.createTripMemberStmt != nil {
+		if cerr := q.createTripMemberStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createTripMemberStmt: %w", cerr)
+		}
+	}
+	if q.createUserStmt != nil {
+		if cerr := q.createUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
+		}
+	}
+	if q.getInterestStmt != nil {
+		if cerr := q.getInterestStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getInterestStmt: %w", cerr)
+		}
+	}
+	if q.getTripStmt != nil {
+		if cerr := q.getTripStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTripStmt: %w", cerr)
+		}
+	}
+	if q.getUserStmt != nil {
+		if cerr := q.getUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
+		}
+	}
+	if q.listInterestsStmt != nil {
+		if cerr := q.listInterestsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listInterestsStmt: %w", cerr)
+		}
+	}
+	if q.listTripMembersStmt != nil {
+		if cerr := q.listTripMembersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listTripMembersStmt: %w", cerr)
+		}
+	}
+	if q.listTripsStmt != nil {
+		if cerr := q.listTripsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listTripsStmt: %w", cerr)
+		}
+	}
+	if q.listUsersStmt != nil {
+		if cerr := q.listUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
+		}
+	}
+	return err
+}
+
+func (q *Queries) exec(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (sql.Result, error) {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).ExecContext(ctx, args...)
+	case stmt != nil:
+		return stmt.ExecContext(ctx, args...)
+	default:
+		return q.db.ExecContext(ctx, query, args...)
+	}
+}
+
+func (q *Queries) query(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (*sql.Rows, error) {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).QueryContext(ctx, args...)
+	case stmt != nil:
+		return stmt.QueryContext(ctx, args...)
+	default:
+		return q.db.QueryContext(ctx, query, args...)
+	}
+}
+
+func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) *sql.Row {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).QueryRowContext(ctx, args...)
+	case stmt != nil:
+		return stmt.QueryRowContext(ctx, args...)
+	default:
+		return q.db.QueryRowContext(ctx, query, args...)
+	}
+}
+
 type Queries struct {
-	db DBTX
+	db                   DBTX
+	tx                   *sql.Tx
+	createInterestStmt   *sql.Stmt
+	createPlaceStmt      *sql.Stmt
+	createTripStmt       *sql.Stmt
+	createTripMemberStmt *sql.Stmt
+	createUserStmt       *sql.Stmt
+	getInterestStmt      *sql.Stmt
+	getTripStmt          *sql.Stmt
+	getUserStmt          *sql.Stmt
+	listInterestsStmt    *sql.Stmt
+	listTripMembersStmt  *sql.Stmt
+	listTripsStmt        *sql.Stmt
+	listUsersStmt        *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db: tx,
+		db:                   tx,
+		tx:                   tx,
+		createInterestStmt:   q.createInterestStmt,
+		createPlaceStmt:      q.createPlaceStmt,
+		createTripStmt:       q.createTripStmt,
+		createTripMemberStmt: q.createTripMemberStmt,
+		createUserStmt:       q.createUserStmt,
+		getInterestStmt:      q.getInterestStmt,
+		getTripStmt:          q.getTripStmt,
+		getUserStmt:          q.getUserStmt,
+		listInterestsStmt:    q.listInterestsStmt,
+		listTripMembersStmt:  q.listTripMembersStmt,
+		listTripsStmt:        q.listTripsStmt,
+		listUsersStmt:        q.listUsersStmt,
 	}
 }
