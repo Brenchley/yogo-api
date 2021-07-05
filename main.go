@@ -11,7 +11,7 @@ import (
 
 const (
 	dbDriver      = "postgres"
-	dbSource      = "postgres://postgres:Sc0rpion@localhost/yogo?sslmode=disable"
+	dbSource      = "postgres://postgres:{Password}@localhost/yogo?sslmode=disable"
 	serverAddress = "0.0.0.0:8080"
 )
 
