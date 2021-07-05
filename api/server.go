@@ -18,6 +18,8 @@ func NewServer(store yogo.Store) *Server {
 
 	// add routes to router
 	router.POST("/api/users/create", server.createUser)
+	router.GET("/api/users/:id", server.getUser)
+	router.GET("/api/users", server.listUsers)
 	server.router = router
 	return server
 }

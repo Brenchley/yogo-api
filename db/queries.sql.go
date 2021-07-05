@@ -233,7 +233,7 @@ func (q *Queries) ListInterests(ctx context.Context) ([]Interest, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Interest
+	items := []Interest{}
 	for rows.Next() {
 		var i Interest
 		if err := rows.Scan(
@@ -266,7 +266,7 @@ func (q *Queries) ListTripMembers(ctx context.Context, tripID int32) ([]TripMemb
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TripMember
+	items := []TripMember{}
 	for rows.Next() {
 		var i TripMember
 		if err := rows.Scan(&i.ID, &i.TripID, &i.Member); err != nil {
@@ -294,7 +294,7 @@ func (q *Queries) ListTrips(ctx context.Context) ([]Trip, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Trip
+	items := []Trip{}
 	for rows.Next() {
 		var i Trip
 		if err := rows.Scan(
@@ -330,7 +330,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	items := []User{}
 	for rows.Next() {
 		var i User
 		if err := rows.Scan(
