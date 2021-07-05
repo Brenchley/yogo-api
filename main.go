@@ -7,17 +7,16 @@ import (
 	_ "github.com/lib/pq"
 	"yogo.io/go-tripPlanner-backend/api"
 	yogo "yogo.io/go-tripPlanner-backend/db"
-)
-
-const (
-	dbDriver      = "postgres"
-	dbSource      = "postgres://postgres:{Password}@localhost/yogo?sslmode=disable"
-	serverAddress = "0.0.0.0:8080"
+	"yogo.io/go-tripPlanner-backend/util"
 )
 
 func main() {
+	config, err := util.LoadConfig(".")
 
-	conn, err := sql.Open(dbDriver, dbSource)
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+	conn, err := sql.Open(config.DBDriver, config.DBSource)
 
 	if err != nil {
 		log.Fatal("Cannot connect to db:", err)
@@ -26,7 +25,7 @@ func main() {
 	store := yogo.NewStore(conn)
 	server := api.NewServer(store)
 
-	err = server.Start(serverAddress)
+	err = server.Start(config.ServerAddress)
 
 	if err != nil {
 		log.Fatal("Cannot start server:", err)
