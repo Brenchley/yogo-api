@@ -5,7 +5,6 @@ CREATE TABLE users (
   username  text NOT NULL,
   status int NOT NULL,
   profile_pic text,
-  is_active int  NOT NULL,
   createdAt timestamp NOT NULL DEFAULT NOW(),
   updatedAt timestamp 
 );
