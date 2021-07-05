@@ -1,11 +1,10 @@
 -- Example queries for sqlc
 CREATE TABLE users (
   id BIGSERIAL PRIMARY KEY,
-  email text      NOT NULL,
+  email text    UNIQUE  NOT NULL,
   username  text NOT NULL,
   status int NOT NULL,
   profile_pic text,
-  is_active int  NOT NULL,
   createdAt timestamp NOT NULL DEFAULT NOW(),
   updatedAt timestamp 
 );

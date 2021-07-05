@@ -7,4 +7,4 @@ adminer:
 
 migrate:
 	migrate -source file://migrations/ \
-			-database postgres://postgres:Sc0rpion@localhost/yogo?sslmode=disable up
+			-database postgres://postgres:{Password}@localhost/yogo?sslmode=disable up
