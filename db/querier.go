@@ -17,6 +17,7 @@ type Querier interface {
 	ListTripMembers(ctx context.Context, tripID int32) ([]TripMember, error)
 	ListTrips(ctx context.Context) ([]Trip, error)
 	ListUsers(ctx context.Context) ([]User, error)
+	CheckUser(ctx context.Context, email string) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

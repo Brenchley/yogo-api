@@ -9,6 +9,27 @@ import (
 	"time"
 )
 
+const checkUser = `-- name: CheckUser :one
+SELECT id, email, username, password, status, profile_pic, createdat, updatedat FROM users
+WHERE email = $1 LIMIT 1
+`
+
+func (q *Queries) CheckUser(ctx context.Context, email string) (User, error) {
+	row := q.queryRow(ctx, q.checkUserStmt, checkUser, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.Password,
+		&i.Status,
+		&i.ProfilePic,
+		&i.Createdat,
+		&i.Updatedat,
+	)
+	return i, err
+}
+
 const createInterest = `-- name: CreateInterest :one
 INSERT INTO interests (
     interest_name, interest_img

@@ -1,27 +1,47 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	yogo "yogo.io/go-tripPlanner-backend/db"
+	"yogo.io/go-tripPlanner-backend/token"
+	"yogo.io/go-tripPlanner-backend/util"
 )
 
 // Servers HTTP requests
 type Server struct {
-	store  yogo.Store
-	router *gin.Engine
+	config     util.Config
+	store      yogo.Store
+	tokenMaker token.Maker
+	router     *gin.Engine
 }
 
 //creates new HTTP server and setup routing
-func NewServer(store yogo.Store) *Server {
-	server := &Server{store: store}
+func NewServer(config util.Config, store yogo.Store) (*Server, error) {
+	// tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
+	server := &Server{
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
+	}
+	server.setupRouter()
+	return server, nil
+}
+
+func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	// add routes to router
+	router.POST("/api/users/login", server.loginUser)
 	router.POST("/api/users/create", server.createUser)
 	router.GET("/api/users/:id", server.getUser)
 	router.GET("/api/users", server.listUsers)
 	server.router = router
-	return server
 }
 
 //run HTTP server on a specific address
