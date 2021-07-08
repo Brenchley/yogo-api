@@ -131,16 +131,17 @@ func (q *Queries) CreateTripMember(ctx context.Context, arg CreateTripMemberPara
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-  email,username, profile_pic, status
+  email,username, password,profile_pic, status
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5
 )
-RETURNING id, email, username, status, profile_pic, createdat, updatedat
+RETURNING id, email, username, password, status, profile_pic, createdat, updatedat
 `
 
 type CreateUserParams struct {
 	Email      string         `json:"email"`
 	Username   string         `json:"username"`
+	Password   string         `json:"password"`
 	ProfilePic sql.NullString `json:"profilePic"`
 	Status     int32          `json:"status"`
 }
@@ -149,6 +150,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	row := q.queryRow(ctx, q.createUserStmt, createUser,
 		arg.Email,
 		arg.Username,
+		arg.Password,
 		arg.ProfilePic,
 		arg.Status,
 	)
@@ -157,6 +159,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.ID,
 		&i.Email,
 		&i.Username,
+		&i.Password,
 		&i.Status,
 		&i.ProfilePic,
 		&i.Createdat,
@@ -203,7 +206,7 @@ func (q *Queries) GetTrip(ctx context.Context, id int32) (Trip, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, username, status, profile_pic, createdat, updatedat FROM users
+SELECT id, email, username, password, status, profile_pic, createdat, updatedat FROM users
 WHERE id = $1 LIMIT 1
 `
 
@@ -214,6 +217,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.ID,
 		&i.Email,
 		&i.Username,
+		&i.Password,
 		&i.Status,
 		&i.ProfilePic,
 		&i.Createdat,
@@ -320,7 +324,7 @@ func (q *Queries) ListTrips(ctx context.Context) ([]Trip, error) {
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, email, username, status, profile_pic, createdat, updatedat FROM users
+SELECT id, email, username, password, status, profile_pic, createdat, updatedat FROM users
 ORDER BY createdAt
 `
 
@@ -337,6 +341,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 			&i.ID,
 			&i.Email,
 			&i.Username,
+			&i.Password,
 			&i.Status,
 			&i.ProfilePic,
 			&i.Createdat,

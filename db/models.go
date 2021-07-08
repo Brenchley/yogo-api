@@ -43,6 +43,7 @@ type User struct {
 	ID         int64          `json:"id"`
 	Email      string         `json:"email"`
 	Username   string         `json:"username"`
+	Password   string         `json:"password"`
 	Status     int32          `json:"status"`
 	ProfilePic sql.NullString `json:"profilePic"`
 	Createdat  time.Time      `json:"createdat"`
