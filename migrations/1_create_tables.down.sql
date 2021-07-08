@@ -1,5 +1,5 @@
-DROP TABLE trip_members;
-DROP TABLE trips;
-DROP TABLE places;
-DROP TABLE interests;
-DROP TABLE users;
+DROP TABLE IF EXISTS trip_members;
+DROP TABLE IF EXISTS trips;
+DROP TABLE IF EXISTS places;
+DROP TABLE IF EXISTS interests;
+DROP TABLE IF EXISTS users;

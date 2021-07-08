@@ -3,6 +3,7 @@ CREATE TABLE users (
   id BIGSERIAL PRIMARY KEY,
   email text    UNIQUE  NOT NULL,
   username  text NOT NULL,
+  password  text NOT NULL,
   status int NOT NULL,
   profile_pic text,
   createdAt timestamp NOT NULL DEFAULT NOW(),
