@@ -2,12 +2,14 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	yogo "yogo.io/go-tripPlanner-backend/db"
+	"yogo.io/go-tripPlanner-backend/token"
 	"yogo.io/go-tripPlanner-backend/util"
 )
 
@@ -100,6 +102,12 @@ func (server *Server) getUser(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.Email != authPayload.Username {
+		err := errors.New("you are unauthorized to view this account")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 	rsp := newUserResponse(user)

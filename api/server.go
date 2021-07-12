@@ -19,8 +19,8 @@ type Server struct {
 
 //creates new HTTP server and setup routing
 func NewServer(config util.Config, store yogo.Store) (*Server, error) {
-	// tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
-	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
+	// tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
@@ -39,8 +39,12 @@ func (server *Server) setupRouter() {
 	// add routes to router
 	router.POST("/api/users/login", server.loginUser)
 	router.POST("/api/users/create", server.createUser)
-	router.GET("/api/users/:id", server.getUser)
-	router.GET("/api/users", server.listUsers)
+
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	authRoutes.GET("/api/users/:id", server.getUser)
+	authRoutes.GET("/api/users", server.listUsers)
+
 	server.router = router
 }
 
