@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	yogo "yogo.io/go-tripPlanner-backend/db"
 	"yogo.io/go-tripPlanner-backend/token"
@@ -35,6 +36,11 @@ func NewServer(config util.Config, store yogo.Store) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+	// same as
+	// config := cors.DefaultConfig()
+	// config.AllowAllOrigins = true
+	// router.Use(cors.New(config))
+	router.Use(cors.Default())
 
 	// add routes to router
 	router.POST("/api/users/login", server.loginUser)
